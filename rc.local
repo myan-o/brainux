@@ -1,0 +1,4 @@
+#!/bin/bash
+
+tee /sys/class/backlight/backlight\@0/brightness <<< 6
+tee /sys/class/backlight/backlight\@1/brightness <<< 0

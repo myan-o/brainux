@@ -1,0 +1,37 @@
+#!/bin/bash
+
+mode="$1"
+dtb="/boot/imx28-pwg5300.dtb"
+dts=`mktemp`
+
+case "$mode" in
+  "host" )
+    value="host"
+    ;;
+  "guest" )
+    value="peripheral"
+    ;;
+esac
+
+mount /dev/mmcblk1p1 /boot
+
+dtc -I dtb -O dts $dtb > $dts 2> /dev/null
+
+pattern='s|(^[\t ]*dr_mode[\t ]*=[\t ]*\")(.*)(\"[\t ]*;[\t ]*$)'
+current=`sed -rn "$pattern|\2|p" $dts | head -1`
+echo "current: $current"
+
+if [ "" != "$value" -a "$current" != "$value" ]
+then
+  echo "next: $value"
+  iswrite=1
+  sed -ri "$pattern|\1$value\3|" $dts
+  dtc -I dts -O dtb $dts > $dtb 2> /dev/null
+fi
+
+umount /boot
+
+if [ "${iswrite+foo}" ]
+then
+  reboot
+fi
