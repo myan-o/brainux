@@ -3,5 +3,5 @@
 dirname=${0%/*}
 
 cat - | \
-$dirname/csv-replace "$1" 1" | \
-$dirname/csv-replace "$2" 2"
+$dirname/csv-replace "$1" 1 | \
+$dirname/csv-replace "$2" 2
