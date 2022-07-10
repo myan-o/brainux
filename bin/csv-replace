@@ -40,7 +40,7 @@ i=0
 for name in ${names[@]}
 do
   code=${codes[$i]}
-  cmd+=" -e 's,^\t* *$code\t* *$,$name,'"
+  cmd+=" -e 's,^[\t ]*$code[\t ]*$,$name,'"
   ((i+=1))
 done
 cmd+=" $keymap_file"
