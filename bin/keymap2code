@@ -1,0 +1,12 @@
+#!/bin/bash
+
+table1=`mktemp`
+cat "$1" | sed -rn "s/(.*),(.*)/\2,\1/p" > "$table1"
+table2=`mktemp`
+cat "$2" | sed -rn "s/(.*),(.*)/\2,\1/p" > "$table2"
+
+dirname=${0%/*}
+
+cat - | \
+$dirname/csv-replace "$table1" 1 | \
+$dirname/csv-replace "$table2" 2

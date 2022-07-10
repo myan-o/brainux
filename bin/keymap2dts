@@ -10,7 +10,7 @@ symbol_keycode=${symbol_csv%%,*}
 cmd="sed -i ':l; N; s/symbol-keycode *\t*= *\t*[^;]*/symbol-keycode = <$symbol_keycode>/; b l;' '$outfile'"
 eval $cmd
 
-symbol_header='KEYMAP-SYMBOL'
+symbol_header='KEYMAP-SYMBOL,KEYMAP-SYMBOL'
 keymap=${csv%$symbol_header*}
 keymap_length=$((${#keymap} + ${#symbol_header}))
 keymap=${keymap//$symbol_csv

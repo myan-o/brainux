@@ -1,0 +1,49 @@
+#!/bin/bash
+
+delim=","
+table="$1"
+col="$2"
+format_code="$3"
+format_name="$4"
+
+((colleft=$col-1))
+((colright=$col+1))
+
+in=`mktemp`
+keymap_file=`mktemp`
+left_file=`mktemp`
+right_file=`mktemp`
+cat - > "$in"
+colmax=`cat "$in" | head -1 | tr "$delim" '\n' | wc -l`
+cmd="cat '$table' | cut -d '$delim' -f 1 $format_name"
+names=(`eval "$cmd"`)
+cmd="cat '$table' | cut -d '$delim' -f 2 $format_code"
+codes=(`eval "$cmd"`)
+cmd="cat '$in' | cut -d '$delim' -f $col $format_code > $keymap_file"
+eval "$cmd"
+
+if [ $colleft -le 0 ]
+then
+  left_file=""
+else
+  cat "$in" | cut -d "$delim" -f -$colleft > $left_file
+fi
+if [ $colright -le $colmax ]
+then
+  cat "$in" | cut -d "$delim" -f $colright- > $right_file
+else
+  right_file=""
+fi
+
+cmd="sed -i"
+i=0
+for name in ${names[@]}
+do
+  code=${codes[$i]}
+  cmd+=" -e 's,^$code$,$name,'"
+  ((i+=1))
+done
+cmd+=" $keymap_file"
+eval "$cmd"
+
+paste -d "$delim" $left_file $keymap_file $right_file
