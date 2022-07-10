@@ -1,0 +1,19 @@
+#!/bin/bash
+
+IFS='
+'
+
+lines=(`cat -`)
+count=${#lines[@]}
+out=""
+for ((i=0; i<$count; i+=2))
+do
+  name=${lines[$i]}
+  code=${lines[$i+1]}
+
+  name=`echo -en "$name" | tr a-z A-Z | tr ' ' '_'`
+  code=`printf "0x%02x" "$code"`
+  out+="$name,$code\n"
+done
+
+echo -en "$out" | sort | uniq

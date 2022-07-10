@@ -1,3 +1,4 @@
 #!/bin/bash
 
-tr -d '\t' | sed -rn 's|.*<(.*) (.*)>.*/\* +(.*) +\*/|\3,\1|p' | tr a-z A-Z | tr ' ' '_' | sort | uniq
+dirname=${0%/*}
+tr -d '\t' | sed -rn 's|.*<(.*) (.*)>.*/\*[\t ]+(.*)[\t ]+\*/|\3\n\1|p' | $dirname/defines
