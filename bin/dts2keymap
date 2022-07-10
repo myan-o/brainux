@@ -1,0 +1,7 @@
+#!/bin/bash
+
+dts=`cat - | tr -d '\t' | tr -d '\n'`
+echo "$dts" | sed -rn 's|.*keymap *= *<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "," $0}}'
+echo "$dts" | cat - | tr -d '\t' | tr -d '\n' | sed -rn 's|.*symbol-keycode *= *<([^>]*).*|\1,SYMBOL\n|p'
+echo "KEYMAP-SYMBOL"
+echo "$dts" | sed -rn 's|.*keymap-symbol *= *<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "," $0}}'
