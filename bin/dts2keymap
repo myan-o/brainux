@@ -24,6 +24,12 @@ function run()
 }
 
 format1=`cat << 'EOF'
+if [ -v inited ];
+then
+  echo -en "\n";
+else
+  inited=1;
+fi;
 if [[ "$line" =~ ^[0-9] ]];
 then
   printf "0x%02x" "$line";
@@ -34,4 +40,4 @@ echo -en ",";
 EOF
 `
 
-run | $dirname/eval-line "$format1" 'echo -en "$line" | sed "s/^KEY_//"; echo -en "\n "'
+run | $dirname/eval-line "$format1" 'echo -en "$line" | sed "s/^KEY_//"'
