@@ -13,4 +13,6 @@ EOF
 `
 cat - |\
 sed -rn 's|^\t* *^#define\t* *KEY_([^\t ]*)\t* *([0-9a-zA-Z]*).*$|\1\n\2|p' |\
-$dirname/eval-line 'echo -en "$line" | sed "s/^KEY_//"; echo -en ","' "$format2"
+$dirname/eval-line 'echo -en "$line" | sed "s/^KEY_//"; echo -en ","' "$format2" |\
+sort |\
+uniq
