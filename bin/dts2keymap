@@ -11,13 +11,15 @@ cat "$dts" | sed -rn 's|^.*keymap[\t ]*=[\t ]*([^;]*);.*$|\1|p' > "$keymap"
 cat "$dts" | sed -rn 's|^.*symbol-keycode[\t ]*=[\t ]*([^;]*);.*$|\1|p' > "$symbol_keycode"
 cat "$dts" | sed -rn 's|^.*keymap-symbol[\t ]*=[\t ]*([^;]*);.*$|\1|p' > "$keymap_symbol"
 
+function csv()
+{
+  cat - | $dirname/eval-line "$format1" 'echo -en "$line" | tr "a-z" "A-Z" | sed "s/^KEY_//"' | sort | uniq
+}
+
 function run()
 {
   cat "$keymap" | sed -rn 's|[^<]*<([^>]*)>[^<]*|\1 |gp' | tr ' ' '\n'
   cat "$symbol_keycode" | sed -rn 's|.*<([^>]*).*|\1\nSYMBOL\n|p'
-  echo "KEYMAP-SYMBOL"
-  echo "KEYMAP-SYMBOL"
-  cat "$keymap_symbol" | sed -rn 's|[^<]*<([^>]*)>[^<]*|\1 |gp' | tr ' ' '\n'
 }
 
 format1=`cat << 'EOF'
@@ -37,4 +39,6 @@ echo -en ",";
 EOF
 `
 
-run | $dirname/eval-line "$format1" 'echo -en "$line" | sed "s/^KEY_//"'
+run | csv
+echo "KEYMAP-SYMBOL,KEYMAP-SYMBOL"
+cat "$keymap_symbol" | sed -rn 's|[^<]*<([^>]*)>[^<]*|\1 |gp' | tr ' ' '\n' | csv
