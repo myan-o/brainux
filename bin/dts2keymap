@@ -1,7 +1,37 @@
 #!/bin/bash
 
-dts=`cat - | tr -d '\t' | tr -d '\n'`
-echo "$dts" | sed -rn 's|.*keymap[\t ]*=[\t ]*<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "," $0}}'
-echo "$dts" | cat - | tr -d '\t' | tr -d '\n' | sed -rn 's|.*symbol-keycode[\t ]*=[\t ]*<([^>]*).*|\1,SYMBOL\n|p'
-echo "KEYMAP-SYMBOL,KEYMAP-SYMBOL"
-echo "$dts" | sed -rn 's|.*keymap-symbol[\t ]*=[\t ]*<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "," $0}}'
+dirname=${0%/*}
+dts=`mktemp`
+keymap=`mktemp`
+keymap_symbol=`mktemp`
+symbol_keycode=`mktemp`
+
+cat - | tr -d '\t' > "$dts"
+cat "$dts" | sed -rn ':l; N; s|^.*keymap[\t ]*=[\t ]*([^;]*);.*$|\1|p; b l;' > "$keymap"
+cat "$dts" | sed -rn ':l; N; s|^.*symbol-keycode[\t ]*=[\t ]*([^;]*);.*$|\1|p; b l;' > "$symbol_keycode"
+cat "$dts" | sed -rn ':l; N; s|^.*keymap-symbol[\t ]*=[\t ]*([^;]*);.*$|\1|p; b l;' > "$keymap_symbol"
+
+function run()
+{
+
+  cat "$keymap" | sed -rn 's|.*<(.*) (.*)>.*/\*[\t ]+(.*)[\t ]+\*/|\1\n\2|p'
+  cat "$keymap" | sed -rn 's|.*<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "\n" $0}}'
+  cat "$symbol_keycode" | sed -rn 's|.*<([^>]*).*|\1\nSYMBOL|p'
+  echo "KEYMAP-SYMBOL"
+  echo "KEYMAP-SYMBOL"
+  cat "$keymap_symbol" | sed -rn 's|.*<([^>]*).*|\1|p' | tr ' ' '\n' | awk '{if(NR%2){l=$0}else{print l "\n" $0}}'
+  cat "$keymap_symbol" | sed -rn 's|.*<(.*) (.*)>.*/\*[\t ]+(.*)[\t ]+\*/|\1\n\2|p'
+}
+
+format1=`cat << 'EOF'
+if [[ "$line" =~ ^[0-9] ]];
+then
+  printf "0x%02x" "$line";
+else
+  echo -en "$line";
+fi;
+echo -en ",";
+EOF
+`
+
+run | $dirname/eval-line "$format1" 'echo -en "$line" | sed "s/^KEY_//"; echo -en "\n "'

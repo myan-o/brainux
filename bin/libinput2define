@@ -1,3 +1,16 @@
 #!/bin/bash
 
-cat - | sed -rn 's|^\t* *^#define\t* *KEY_([^\t ]*)\t* *([0-9a-zA-Z]*).*$|\1\n\2|p' | defines
+dirname=${0%/*}
+format2=`cat << 'EOF'
+if [[ "$line" =~ ^[0-9] ]];
+then
+  printf "0x%02x" "$line";
+else
+  echo -en "$line";
+fi;
+echo -en "\n ";
+EOF
+`
+cat - |\
+sed -rn 's|^\t* *^#define\t* *KEY_([^\t ]*)\t* *([0-9a-zA-Z]*).*$|\1\n\2|p' |\
+$dirname/eval-line 'echo -en "$line" | sed "s/^KEY_//"; echo -en ","' "$format2"

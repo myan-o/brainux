@@ -1,4 +1,6 @@
 #!/bin/bash
 
 dirname=${0%/*}
-tr -d '\t' | sed -rn 's|.*<(.*) (.*)>.*/\*[\t ]+(.*)[\t ]+\*/|\3\n\1|p' | $dirname/defines
+tr -d '\t' | \
+sed -rn 's|.*<(.*) (.*)>.*/\*[\t ]+(.*)[\t ]+\*/|\3\n\1|p' | \
+$dirname/eval-line 'echo -en "$line" | sed "s/^KEY_//"; echo -en ","' 'printf "0x%02x" "$line"; echo -en "\n "'

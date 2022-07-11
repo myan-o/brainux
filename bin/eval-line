@@ -1,0 +1,16 @@
+#!/bin/bash
+
+IFS='
+'
+
+i=1
+cat - | while read line
+do
+  eval "${@:$i:$i}"
+  if [ $i -ge $# ]
+  then
+    i=1
+  else
+    ((i+=1))
+  fi
+done
