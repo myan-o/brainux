@@ -5,17 +5,17 @@ csv=`cat -`
 outfile=`mktemp`
 cat "$1" > "$outfile"
 
-symbol_csv=`sed -n 's/.*,[\t ]*SYMBOL[\t ]*/\0/p' "$1"`
+symbol_csv=`echo "$csv" | sed -n 's/.*,[\t ]*SYMBOL[\t ]*/\0/p'`
 symbol_keycode=${symbol_csv%%,*}
 cmd="sed -i ':l; N; s/symbol-keycode[\t ]*=[\t ]*[^;]*/symbol-keycode = <$symbol_keycode>/; b l;' '$outfile'"
-eval $cmd
+eval "$cmd"
 
 symbol_header='KEYMAP-SYMBOL,KEYMAP-SYMBOL'
 keymap=${csv%$symbol_header*}
 keymap_length=$((${#keymap} + ${#symbol_header}))
+keymap=`echo "$keymap" | sed -e '/^.*,[\t ]*$/d' -e '/^.*,[\t ]*$/d'`
 keymap=${keymap//$symbol_csv
 /}
-keymap=`echo "$keymap" | sed '/^.*,[\t ]*$/d'`
 keymap=${keymap//,/\ }
 keymap=${keymap//
 /\ }
@@ -24,7 +24,7 @@ cmd="sed -i ':l; N; s/keymap[\t ]*=[^;]*/keymap = <$keymap>/; b l;' '$outfile'"
 eval "$cmd"
 
 keymap_symbol=${csv:$keymap_length}
-keymap_symbol=`echo "$keymap_symbol" | sed '/^.*,[\t ]*$/d'`
+keymap_symbol=`echo "$keymap_symbol" | sed -e '/^.*,[\t ]*$/d' -e '/^.*,[\t ]*$/d'`
 keymap_symbol=${keymap_symbol//,/\ }
 keymap_symbol=${keymap_symbol//
 /\ }
