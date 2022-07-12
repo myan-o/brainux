@@ -40,5 +40,6 @@ EOF
 `
 
 run | csv
+echo ""
 echo "KEYMAP-SYMBOL,KEYMAP-SYMBOL"
 cat "$keymap_symbol" | sed -rn 's|[^<]*<([^>]*)>[^<]*|\1 |gp' | tr ' ' '\n' | csv
