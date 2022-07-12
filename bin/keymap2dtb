@@ -1,10 +1,9 @@
 #!/bin/bash
 
-keymap="$1"
-dtb="$2"
+dtb="$1"
 dirname=${0%/*}
 
-if [ $# -le 1 ]
+if [ $# -eq 0 ]
 then
   dtb="/boot/imx28-pwg5300.dtb"
   mount /dev/mmcblk1p1 /boot
@@ -17,7 +16,7 @@ then
   dts=`mktemp`
   dts2=`mktemp`
   dtc -I dtb -O dts $dtb > $dts 2> /dev/null
-  cat $dts | ${dirname}/keymap2dts "$keymap" > $dts2
+  cat - | ${dirname}/keymap2dts $dts > $dts2
   dtc -I dts -O dtb $dts2 > $dtb2 2> /dev/null
   if [ -s "$dtb2" ]
   then
@@ -29,7 +28,7 @@ else
     echo "$dtb is not found"
 fi
 
-if [ $# -le 1 ]
+if [ $# -eq 0 ]
 then
   umount /boot
   reboot

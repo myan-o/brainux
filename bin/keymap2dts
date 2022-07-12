@@ -1,9 +1,9 @@
 #!/bin/bash
 
-csv=`cat $1`
+csv=`cat -`
 
 outfile=`mktemp`
-cat - > "$outfile"
+cat "$1" > "$outfile"
 
 symbol_csv=`sed -n 's/.*,[\t ]*SYMBOL[\t ]*/\0/p' "$1"`
 symbol_keycode=${symbol_csv%%,*}
