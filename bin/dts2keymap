@@ -13,7 +13,7 @@ cat "$dts" | sed -rn 's|^.*keymap-symbol[\t ]*=[\t ]*([^;]*);.*$|\1|p' > "$keyma
 
 function csv()
 {
-  cat - | $dirname/eval-line "$format1" 'echo -en "$line" | tr "a-z" "A-Z" | sed "s/^KEY_//"' | sort -t , -k 2,2 | awk '{ print length($2), $0 }' | sort -n -s | cut -d" " -f2- | uniq
+  cat - | $dirname/eval-line "$format1" 'echo -en "$line" | tr "a-z" "A-Z" | sed "s/^KEY_//"' # | sort -t , -k 2,2 | awk '{ print length($2), $0 }' | sort -n -s | cut -d" " -f2- | uniq
 }
 
 function run()
