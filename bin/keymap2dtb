@@ -2,8 +2,6 @@
 
 keymap="$1"
 dtb="$2"
-dts=`mktemp`
-dts2=`mktemp`
 dirname=${0%/*}
 
 if [ $# -le 1 ]
@@ -15,11 +13,20 @@ fi
 
 if [ -f $dtb ]
 then
+  dtb2=`mktemp`
+  dts=`mktemp`
+  dts2=`mktemp`
   dtc -I dtb -O dts $dtb > $dts 2> /dev/null
   cat $dts | ${dirname}/keymap2dts "$keymap" > $dts2
-  dtc -I dts -O dtb $dts2 > $dtb 2> /dev/null
+  dtc -I dts -O dtb $dts2 > $dtb2 2> /dev/null
+  if [ -s "$dtb2" ]
+  then
+    cp "$dtb2" "$dtb"
+  else
+    echo "format error"
+  fi
 else
-  echo "$dtb is not found"
+    echo "$dtb is not found"
 fi
 
 if [ $# -le 1 ]
